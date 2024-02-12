@@ -1,0 +1,36 @@
+name: Lint
+
+on:
+  push:
+    branches: [main, releases/**]
+  pull_request:
+    branches: ["**"]
+  merge_group:
+    types: [checks_requested]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint
+    runs-on:
+      labels: [ubuntu-latest]
+    permissions:
+      actions: read
+      contents: read
+      checks: write
+
+    strategy:
+      fail-fast: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Trunk Check
+        uses: trunk-io/trunk-action@97ecd21fe6c743bf7a606791584b683a7995c70e # v1.1.9
+        with:
+          trunk-path: tools/trunk
+          cache: false
